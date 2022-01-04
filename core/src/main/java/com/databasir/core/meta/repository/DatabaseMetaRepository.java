@@ -1,6 +1,6 @@
 package com.databasir.core.meta.repository;
 
-import com.databasir.core.meta.pojo.DatabaseMeta;
+import com.databasir.core.meta.data.DatabaseMeta;
 import com.databasir.core.meta.repository.condition.Condition;
 
 import java.sql.Connection;

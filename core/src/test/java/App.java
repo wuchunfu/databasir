@@ -1,5 +1,5 @@
 import com.databasir.core.Databasir;
-import com.databasir.core.meta.pojo.DatabaseMeta;
+import com.databasir.core.meta.data.DatabaseMeta;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileOutputStream;

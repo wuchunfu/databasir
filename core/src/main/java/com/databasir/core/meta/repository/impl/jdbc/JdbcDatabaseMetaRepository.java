@@ -1,7 +1,7 @@
 package com.databasir.core.meta.repository.impl.jdbc;
 
-import com.databasir.core.meta.pojo.DatabaseMeta;
-import com.databasir.core.meta.pojo.TableMeta;
+import com.databasir.core.meta.data.DatabaseMeta;
+import com.databasir.core.meta.data.TableMeta;
 import com.databasir.core.meta.repository.DatabaseMetaRepository;
 import com.databasir.core.meta.repository.TableMetaRepository;
 import com.databasir.core.meta.repository.condition.Condition;

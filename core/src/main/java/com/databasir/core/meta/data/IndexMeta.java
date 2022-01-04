@@ -1,4 +1,4 @@
-package com.databasir.core.meta.pojo;
+package com.databasir.core.meta.data;
 
 import lombok.Builder;
 import lombok.Data;

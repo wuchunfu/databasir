@@ -1,8 +1,8 @@
 package com.databasir.core.render;
 
-import com.databasir.core.meta.pojo.ColumnMeta;
-import com.databasir.core.meta.pojo.IndexMeta;
-import com.databasir.core.meta.pojo.TriggerMeta;
+import com.databasir.core.meta.data.ColumnMeta;
+import com.databasir.core.meta.data.IndexMeta;
+import com.databasir.core.meta.data.TriggerMeta;
 import lombok.Data;
 
 import java.util.LinkedHashMap;

@@ -1,6 +1,6 @@
 package com.databasir.core.render;
 
-import com.databasir.core.meta.pojo.DatabaseMeta;
+import com.databasir.core.meta.data.DatabaseMeta;
 import com.databasir.core.render.markdown.MarkdownTemplateRender;
 
 import java.io.IOException;

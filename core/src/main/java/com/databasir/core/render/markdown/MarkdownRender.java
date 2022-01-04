@@ -1,7 +1,7 @@
 package com.databasir.core.render.markdown;
 
-import com.databasir.core.meta.pojo.DatabaseMeta;
-import com.databasir.core.meta.pojo.TableMeta;
+import com.databasir.core.meta.data.DatabaseMeta;
+import com.databasir.core.meta.data.TableMeta;
 import com.databasir.core.render.Render;
 import com.databasir.core.render.RenderConfig;
 import lombok.Getter;

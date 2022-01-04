@@ -1,4 +1,4 @@
-package com.databasir.core.meta.pojo;
+package com.databasir.core.meta.data;
 
 import lombok.Builder;
 import lombok.Data;
@@ -34,8 +34,6 @@ public class DatabaseMeta {
      * database_name
      */
     private String databaseName;
-
-    private String remark;
 
     @Builder.Default
     private List<TableMeta> tables = Collections.emptyList();

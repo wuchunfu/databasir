@@ -1,6 +1,6 @@
 package com.databasir.core.meta.repository.impl.jdbc;
 
-import com.databasir.core.meta.pojo.IndexMeta;
+import com.databasir.core.meta.data.IndexMeta;
 import com.databasir.core.meta.repository.IndexMetaRepository;
 import com.databasir.core.meta.repository.condition.TableCondition;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package com.databasir.core.meta.repository.impl.jdbc;
 
-import com.databasir.core.meta.pojo.TableMeta;
+import com.databasir.core.meta.data.TableMeta;
 import com.databasir.core.meta.repository.ColumnMetaRepository;
 import com.databasir.core.meta.repository.IndexMetaRepository;
 import com.databasir.core.meta.repository.TableMetaRepository;

@@ -28,10 +28,9 @@ subprojects {
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
         implementation "org.mapstruct:mapstruct:${mapstructVersion}"
-        annotationProcessor "org.mapstruct:mapstruct:${mapstructVersion}"
+        annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
         implementation "org.slf4j:slf4j-api:${slf4jVersion}"
-
     }
 
     test {

@@ -1,6 +1,6 @@
 package com.databasir.core.meta.repository.impl.jdbc;
 
-import com.databasir.core.meta.pojo.ColumnMeta;
+import com.databasir.core.meta.data.ColumnMeta;
 import com.databasir.core.meta.repository.ColumnMetaRepository;
 import com.databasir.core.meta.repository.condition.TableCondition;
 import lombok.RequiredArgsConstructor;
