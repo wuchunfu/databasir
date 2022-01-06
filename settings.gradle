@@ -8,5 +8,7 @@ pluginManagement {
 
 rootProject.name = 'databasir'
 include 'core'
-include 'web'
+include 'api'
+include 'common'
+include 'dao'
 
