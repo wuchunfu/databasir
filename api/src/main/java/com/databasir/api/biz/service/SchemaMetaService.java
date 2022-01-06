@@ -9,9 +9,9 @@ import com.databasir.api.biz.data.SchemaMetaVersionResponse;
 import com.databasir.api.biz.database.DatabaseConnections;
 import com.databasir.api.biz.exception.WebDatabasirErrors;
 import com.databasir.api.dao.*;
-import com.databasir.api.persist.tables.pojos.*;
 import com.databasir.core.Databasir;
 import com.databasir.core.meta.data.DatabaseMeta;
+import com.databasir.dao.tables.pojos.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -60,26 +61,26 @@ public class SchemaMetaService {
 
     @Transactional
     public void syncBySchemaSourceId(Integer schemaSourceId) {
-        SchemaSource schemaSource = schemaSourceDao.selectOptionalById(schemaSourceId)
+        SchemaSourcePojo schemaSource = schemaSourceDao.selectOptionalById(schemaSourceId)
                 .orElseThrow(WebDatabasirErrors.SCHEMA_SOURCE_NOT_FOUND::exception);
-        Connection connection = connectionDao.selectBySchemaSourceId(schemaSourceId);
-        List<ConnectionProperty> properties = connectionPropertyDao.selectByConnectionId(connection.getId());
+        ConnectionPojo connection = connectionDao.selectBySchemaSourceId(schemaSourceId);
+        List<ConnectionPropertyPojo> properties = connectionPropertyDao.selectByConnectionId(connection.getId());
         String schemaName = schemaSource.getSchemaName();
-        java.sql.Connection jdbcConnection =
+        Connection jdbcConnection =
                 databaseConnections.create(schemaSource.getDatabaseType(), schemaName, connection, properties);
 
         DatabaseMeta meta = Databasir.of()
                 .get(jdbcConnection, schemaName)
                 .orElseThrow(WebDatabasirErrors.DATABASE_META_NOT_FOUND::exception);
-        Optional<SchemaMeta> schemaMetaOpt = schemaMetaDao.selectOptionalBySchemaSourceId(schemaSourceId);
+        Optional<SchemaMetaPojo> schemaMetaOpt = schemaMetaDao.selectOptionalBySchemaSourceId(schemaSourceId);
         Long version;
         if (schemaMetaOpt.isPresent()) {
             // save history
-            SchemaMeta schemaMeta = schemaMetaOpt.get();
+            SchemaMetaPojo schemaMeta = schemaMetaOpt.get();
             version = schemaMeta.getVersion() + 1;
             Integer schemaMetaId = schemaMeta.getId();
             SchemaMetaResponse schemaMetaObj = getOne(schemaMetaId, null).orElse(null);
-            SchemaMetaHistory history = schemaMetaHistoryConverter.of(schemaMetaObj, schemaSourceId, schemaMetaId, schemaMeta.getVersion());
+            SchemaMetaHistoryPojo history = schemaMetaHistoryConverter.of(schemaMetaObj, schemaSourceId, schemaMetaId, schemaMeta.getVersion());
             schemaMetaHistoryDao.insertAndReturnId(history);
             log.info("save old meta info to history success");
 
@@ -103,13 +104,13 @@ public class SchemaMetaService {
             schemaMetaId = schemaMetaDao.insertAndReturnId(metaConverter.toPojo(schemaSourceId, meta, version));
         }
         meta.getTables().forEach(table -> {
-            TableMeta tableMeta = metaConverter.toPojo(schemaMetaId, table);
+            TableMetaPojo tableMeta = metaConverter.toPojo(schemaMetaId, table);
             Integer tableMetaId = tableMetaDao.insertAndReturnId(tableMeta);
-            List<TableColumnMeta> tableColumnMetas = metaConverter.toColumnPojo(schemaMetaId, tableMetaId, table.getColumns());
+            List<TableColumnMetaPojo> tableColumnMetas = metaConverter.toColumnPojo(schemaMetaId, tableMetaId, table.getColumns());
             tableColumnMetaDao.batchInsert(tableColumnMetas);
-            List<TableIndexMeta> tableIndexMetas = metaConverter.toIndexPojo(schemaMetaId, tableMetaId, table.getIndexes());
+            List<TableIndexMetaPojo> tableIndexMetas = metaConverter.toIndexPojo(schemaMetaId, tableMetaId, table.getIndexes());
             tableIndexMetaDao.batchInsert(tableIndexMetas);
-            List<TableTriggerMeta> tableTriggerMetas = metaConverter.toTriggerPojo(schemaMetaId, tableMetaId, table.getTriggers());
+            List<TableTriggerMetaPojo> tableTriggerMetas = metaConverter.toTriggerPojo(schemaMetaId, tableMetaId, table.getTriggers());
             tableTriggerMetaDao.batchInsert(tableTriggerMetas);
         });
         log.info("save new meta info success");
@@ -124,21 +125,21 @@ public class SchemaMetaService {
         if (version == null) {
             return schemaMetaDao.selectOptionalById(id)
                     .map(schemaMeta -> {
-                        List<TableMeta> tables = tableMetaDao.selectBySchemaMetaId(id);
-                        List<TableColumnMeta> columns = tableColumnMetaDao.selectBySchemaMetaId(id);
-                        List<TableIndexMeta> indexes = tableIndexMetaDao.selectBySchemaMetaId(id);
-                        List<TableTriggerMeta> triggers = tableTriggerMetaDao.selectBySchemaMetaId(id);
-                        Map<Integer, List<TableColumnMeta>> columnsGroupByTableMetaId = columns.stream()
-                                .collect(Collectors.groupingBy(TableColumnMeta::getTableMetaId));
-                        Map<Integer, List<TableIndexMeta>> indexesGroupByTableMetaId = indexes.stream()
-                                .collect(Collectors.groupingBy(TableIndexMeta::getTableMetaId));
-                        Map<Integer, List<TableTriggerMeta>> triggersGroupByTableMetaId = triggers.stream()
-                                .collect(Collectors.groupingBy(TableTriggerMeta::getTableMetaId));
+                        List<TableMetaPojo> tables = tableMetaDao.selectBySchemaMetaId(id);
+                        List<TableColumnMetaPojo> columns = tableColumnMetaDao.selectBySchemaMetaId(id);
+                        List<TableIndexMetaPojo> indexes = tableIndexMetaDao.selectBySchemaMetaId(id);
+                        List<TableTriggerMetaPojo> triggers = tableTriggerMetaDao.selectBySchemaMetaId(id);
+                        Map<Integer, List<TableColumnMetaPojo>> columnsGroupByTableMetaId = columns.stream()
+                                .collect(Collectors.groupingBy(TableColumnMetaPojo::getTableMetaId));
+                        Map<Integer, List<TableIndexMetaPojo>> indexesGroupByTableMetaId = indexes.stream()
+                                .collect(Collectors.groupingBy(TableIndexMetaPojo::getTableMetaId));
+                        Map<Integer, List<TableTriggerMetaPojo>> triggersGroupByTableMetaId = triggers.stream()
+                                .collect(Collectors.groupingBy(TableTriggerMetaPojo::getTableMetaId));
                         List<SchemaMetaResponse.TableMetaResponse> tableMetaResponseList = tables.stream()
                                 .map(table -> {
-                                    List<TableColumnMeta> subColumns = columnsGroupByTableMetaId.getOrDefault(table.getId(), Collections.emptyList());
-                                    List<TableIndexMeta> subIndexes = indexesGroupByTableMetaId.getOrDefault(table.getId(), Collections.emptyList());
-                                    List<TableTriggerMeta> subTriggers = triggersGroupByTableMetaId.getOrDefault(table.getId(), Collections.emptyList());
+                                    List<TableColumnMetaPojo> subColumns = columnsGroupByTableMetaId.getOrDefault(table.getId(), Collections.emptyList());
+                                    List<TableIndexMetaPojo> subIndexes = indexesGroupByTableMetaId.getOrDefault(table.getId(), Collections.emptyList());
+                                    List<TableTriggerMetaPojo> subTriggers = triggersGroupByTableMetaId.getOrDefault(table.getId(), Collections.emptyList());
                                     return metaResponseConverter.of(table, subColumns, subIndexes, subTriggers);
                                 })
                                 .collect(Collectors.toList());

@@ -3,10 +3,10 @@ package com.databasir.api.biz.converter;
 import com.databasir.api.biz.data.SchemaSourceCreateRequest;
 import com.databasir.api.biz.data.SchemaSourceResponse;
 import com.databasir.api.biz.data.SchemaSourceUpdateRequest;
-import com.databasir.api.persist.tables.pojos.Connection;
-import com.databasir.api.persist.tables.pojos.ConnectionProperty;
-import com.databasir.api.persist.tables.pojos.SchemaSource;
-import com.databasir.api.persist.tables.pojos.SchemaSourceMetaRule;
+import com.databasir.dao.tables.pojos.ConnectionPojo;
+import com.databasir.dao.tables.pojos.ConnectionPropertyPojo;
+import com.databasir.dao.tables.pojos.SchemaSourceMetaRulePojo;
+import com.databasir.dao.tables.pojos.SchemaSourcePojo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -18,15 +18,17 @@ public interface SchemaSourceConverter {
 
     @Mapping(target = "id", source = "database.id")
     @Mapping(target = "createAt", source = "database.createAt")
-    SchemaSourceResponse toResponse(SchemaSource database, SchemaSourceResponse.ConnectionResponse connection, SchemaSourceResponse.SchemaSourceMetaRuleResponse sourceMetaRule);
+    SchemaSourceResponse toResponse(SchemaSourcePojo database,
+                                    SchemaSourceResponse.ConnectionResponse connection,
+                                    SchemaSourceResponse.SchemaSourceMetaRuleResponse sourceMetaRule);
 
-    SchemaSourceResponse.ConnectionResponse toResponse(Connection connection, List<ConnectionProperty> properties);
+    SchemaSourceResponse.ConnectionResponse toResponse(ConnectionPojo connection, List<ConnectionPropertyPojo> properties);
 
     @Mapping(target = "ignoreTableNameRegexes", source = "ignoreTableNameRegexArray")
     @Mapping(target = "ignoreColumnNameRegexes", source = "ignoreColumnNameRegexArray")
-    SchemaSourceResponse.SchemaSourceMetaRuleResponse toResponse(SchemaSourceMetaRule rule);
+    SchemaSourceResponse.SchemaSourceMetaRuleResponse toResponse(SchemaSourceMetaRulePojo rule);
 
-    SchemaSource of(SchemaSourceCreateRequest request);
+    SchemaSourcePojo of(SchemaSourceCreateRequest request);
 
-    SchemaSource of(SchemaSourceUpdateRequest request);
+    SchemaSourcePojo of(SchemaSourceUpdateRequest request);
 }

@@ -9,10 +9,10 @@ import com.databasir.api.dao.ConnectionDao;
 import com.databasir.api.dao.ConnectionPropertyDao;
 import com.databasir.api.dao.SchemaSourceDao;
 import com.databasir.api.dao.SchemaSourceMetaRuleDao;
-import com.databasir.api.persist.tables.pojos.Connection;
-import com.databasir.api.persist.tables.pojos.ConnectionProperty;
-import com.databasir.api.persist.tables.pojos.SchemaSource;
-import com.databasir.api.persist.tables.pojos.SchemaSourceMetaRule;
+import com.databasir.dao.tables.pojos.ConnectionPojo;
+import com.databasir.dao.tables.pojos.ConnectionPropertyPojo;
+import com.databasir.dao.tables.pojos.SchemaSourceMetaRulePojo;
+import com.databasir.dao.tables.pojos.SchemaSourcePojo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -44,10 +44,10 @@ public class SchemaSourceService {
     public SchemaSourceResponse getOne(Integer id) {
         return schemaSourceDao.selectOptionalById(id)
                 .map(schemaSource -> {
-                    Connection connection = connectionDao.selectBySchemaSourceId(id);
-                    List<ConnectionProperty> properties = connectionPropertyDao.selectByConnectionId(connection.getId());
+                    ConnectionPojo connection = connectionDao.selectBySchemaSourceId(id);
+                    List<ConnectionPropertyPojo> properties = connectionPropertyDao.selectByConnectionId(connection.getId());
                     SchemaSourceResponse.ConnectionResponse connectionResponse = schemaSourceConverter.toResponse(connection, properties);
-                    SchemaSourceMetaRule rule = schemaSourceMetaRuleDao.selectBySchemaSourceId(id);
+                    SchemaSourceMetaRulePojo rule = schemaSourceMetaRuleDao.selectBySchemaSourceId(id);
                     SchemaSourceResponse.SchemaSourceMetaRuleResponse ruleResponse = schemaSourceConverter.toResponse(rule);
                     return schemaSourceConverter.toResponse(schemaSource, connectionResponse, ruleResponse);
                 })
@@ -56,16 +56,16 @@ public class SchemaSourceService {
 
     @Transactional
     public Integer create(SchemaSourceCreateRequest request) {
-        SchemaSource schemaSource = schemaSourceConverter.of(request);
+        SchemaSourcePojo schemaSource = schemaSourceConverter.of(request);
         Integer schemaSourceId = schemaSourceDao.insertAndReturnId(schemaSource);
 
-        Connection connection = connectionConverter.of(request.getConnection(), schemaSourceId);
+        ConnectionPojo connection = connectionConverter.of(request.getConnection(), schemaSourceId);
         Integer connectionId = connectionDao.insertAndReturnId(connection);
         List<ConnectionPropertyValue> propertyValues = request.getConnection().getProperties();
-        List<ConnectionProperty> properties = connectionConverter.of(propertyValues, connectionId);
+        List<ConnectionPropertyPojo> properties = connectionConverter.of(propertyValues, connectionId);
         connectionPropertyDao.batchInsert(properties);
 
-        SchemaSourceMetaRule sourceMetaRule = databaseMetaRuleConverter.of(request.getSchemaMetaRule(), schemaSourceId);
+        SchemaSourceMetaRulePojo sourceMetaRule = databaseMetaRuleConverter.of(request.getSchemaMetaRule(), schemaSourceId);
         schemaSourceMetaRuleDao.insertAndReturnId(sourceMetaRule);
         return schemaSourceId;
     }
@@ -74,13 +74,13 @@ public class SchemaSourceService {
     public void update(SchemaSourceUpdateRequest request) {
         if (schemaSourceDao.existsById(request.getId())) {
             // update connection
-            Connection connection = connectionConverter.of(request.getConnection(), request.getId());
+            ConnectionPojo connection = connectionConverter.of(request.getConnection(), request.getId());
             connectionDao.updateBySchemaSourceId(connection);
 
             // update connection property
             Integer connectionId = connectionDao.selectBySchemaSourceId(request.getId()).getId();
             List<ConnectionPropertyValue> propertyValues = request.getConnection().getProperties();
-            List<ConnectionProperty> properties = connectionConverter.of(propertyValues, connectionId);
+            List<ConnectionPropertyPojo> properties = connectionConverter.of(propertyValues, connectionId);
             if (properties.isEmpty()) {
                 connectionPropertyDao.deleteByConnectionId(connectionId);
             } else {
@@ -88,10 +88,10 @@ public class SchemaSourceService {
                 connectionPropertyDao.batchInsert(properties);
             }
 
-            SchemaSourceMetaRule sourceMetaRule = databaseMetaRuleConverter.of(request.getSchemaMetaRule(), request.getId());
+            SchemaSourceMetaRulePojo sourceMetaRule = databaseMetaRuleConverter.of(request.getSchemaMetaRule(), request.getId());
             schemaSourceMetaRuleDao.updateBySchemaSourceId(sourceMetaRule);
 
-            SchemaSource schemaSource = schemaSourceConverter.of(request);
+            SchemaSourcePojo schemaSource = schemaSourceConverter.of(request);
             schemaSourceDao.updateById(schemaSource);
         } else {
             throw WebDatabasirErrors.SCHEMA_SOURCE_NOT_FOUND.exception();
@@ -103,7 +103,7 @@ public class SchemaSourceService {
     }
 
     public Page<SchemaSourceSimpleResponse> list(Pageable page, SchemaSourceListCondition condition) {
-        Page<SchemaSource> pageData = schemaSourceDao.selectByPage(page, condition.toCondition());
+        Page<SchemaSourcePojo> pageData = schemaSourceDao.selectByPage(page, condition.toCondition());
         return pageData.map(connectionConverter::toSimpleResponse);
     }
 }

@@ -1,7 +1,8 @@
 package com.databasir.api.biz.database;
 
 import com.databasir.api.biz.exception.WebDatabasirErrors;
-import com.databasir.api.persist.tables.pojos.ConnectionProperty;
+import com.databasir.dao.tables.pojos.ConnectionPojo;
+import com.databasir.dao.tables.pojos.ConnectionPropertyPojo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +18,8 @@ public class DatabaseConnections {
 
     public Connection create(String databaseType,
                              String schemaName,
-                             com.databasir.api.persist.tables.pojos.Connection connection,
-                             List<ConnectionProperty> properties) {
+                             ConnectionPojo connection,
+                             List<ConnectionPropertyPojo> properties) {
         String username = connection.getUsername();
         String password = connection.getPassword();
         String url = connection.getUrl();

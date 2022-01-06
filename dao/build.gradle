@@ -2,7 +2,10 @@ apply plugin: 'nu.studer.jooq'
 
 dependencies {
     implementation "org.jooq:jooq:${jooqVersion}"
+    implementation "org.jooq:jooq-codegen:${jooqVersion}"
     jooqGenerator "mysql:mysql-connector-java:${mysqlConnectorVersion}"
+    // include self to use strategy
+    jooqGenerator project(':dao')
 }
 
 sourceSets {
@@ -57,10 +60,10 @@ jooq {
                         pojos = true
                     }
                     target {
-                        packageName = 'com.databasir.web.persist'
+                        packageName = 'com.databasir.dao'
                         directory = 'generated-src/jooq/main/java'
                     }
-                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+                    strategy.name = 'com.databasir.dao.strategy.DatabasirPojoNamingStrategy'
                 }
             }
         }

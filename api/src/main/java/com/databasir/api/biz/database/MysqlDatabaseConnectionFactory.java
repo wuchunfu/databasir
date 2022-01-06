@@ -1,5 +1,6 @@
 package com.databasir.api.biz.database;
 
+import com.databasir.api.biz.exception.WebDatabasirErrors;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -31,7 +32,7 @@ public class MysqlDatabaseConnectionFactory implements DatabaseConnectionFactory
         try {
             return DriverManager.getConnection(jdbcUrl, info);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            throw WebDatabasirErrors.CONNECT_DATABASE_FAILED.exception(e);
         }
     }
 

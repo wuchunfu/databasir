@@ -58,11 +58,15 @@ public class DatabasirExceptionAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = DatabasirException.class)
     public ResponseEntity<Object> handleBusinessException(
-            DatabasirException businessException, WebRequest request) {
+            DatabasirException databasirException, WebRequest request) {
 
         String path = getPath(request);
-        JsonData<Void> body = JsonData.error(businessException.getErrCode(), businessException.getErrMessage());
-        log.warn("BusinessException, request: {}, exception: {}", path, businessException.getErrMessage());
+        JsonData<Void> body = JsonData.error(databasirException.getErrCode(), databasirException.getErrMessage());
+        if (databasirException.getCause() == null) {
+            log.warn("BusinessException, request: {}, exception: {}", path, databasirException.getErrMessage());
+        } else {
+            log.warn("BusinessException, request: " + path, databasirException);
+        }
         return ResponseEntity.ok().body(body);
     }
 
@@ -88,7 +92,6 @@ public class DatabasirExceptionAdvice extends ResponseEntityExceptionHandler {
         return handleNon200Response(errorMsg, HttpStatus.INTERNAL_SERVER_ERROR, path);
     }
 
-    // Override ExceptionHandler start ============>
     @Override
     public ResponseEntity<Object> handleBindException(
             BindException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -159,7 +162,6 @@ public class DatabasirExceptionAdvice extends ResponseEntityExceptionHandler {
         return handleOverriddenException(ex, headers, status, request, ex.getMessage());
     }
 
-    // helper private method start ===>
     private String buildMessages(BindingResult result) {
 
         StringBuilder resultBuilder = new StringBuilder();

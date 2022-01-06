@@ -1,6 +1,6 @@
 package com.databasir.api.biz.data;
 
-import com.databasir.api.persist.Tables;
+import com.databasir.dao.Tables;
 import lombok.Data;
 import org.jooq.Condition;
 import org.jooq.impl.DSL;
